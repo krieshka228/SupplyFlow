@@ -62,3 +62,27 @@ public sealed class SupplyRepository(SupplyFlowDbContext context) : ISupplyRepos
 
     public Task SaveChangesAsync(CancellationToken cancellationToken = default) => context.SaveChangesAsync(cancellationToken);
 }
+
+public sealed class SupplyWorkflowRepository(SupplyFlowDbContext context) : ISupplyWorkflowRepository
+{
+    public async Task ResetAsync(CancellationToken cancellationToken = default)
+    {
+        context.SupplyItems.RemoveRange(context.SupplyItems);
+        context.Supplies.RemoveRange(context.Supplies);
+        context.Products.RemoveRange(context.Products);
+        context.Suppliers.RemoveRange(context.Suppliers);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task SeedAsync(
+        IReadOnlyList<Product> products,
+        IReadOnlyList<Supplier> suppliers,
+        IReadOnlyList<Supply> supplies,
+        CancellationToken cancellationToken = default)
+    {
+        await context.Products.AddRangeAsync(products, cancellationToken);
+        await context.Suppliers.AddRangeAsync(suppliers, cancellationToken);
+        await context.Supplies.AddRangeAsync(supplies, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+}

@@ -1,0 +1,65 @@
+@page "/suppliers"
+@inject ISupplierService SupplierService
+
+<section class="page">
+    <header>
+        <h1>Поставщики</h1>
+        <button class="primary" @onclick="(() => ShowCreate = !ShowCreate)">Добавить поставщика</button>
+    </header>
+
+    @if (ShowCreate)
+    {
+        <form class="form" @onsubmit="CreateSupplier">
+            <label>Название<input @bind="Form.Name" required /></label>
+            <label>Email<input type="email" @bind="Form.ContactEmail" required /></label>
+            <label>Телефон<input @bind="Form.Phone" /></label>
+            <label>Страна<input @bind="Form.Country" /></label>
+            <button type="submit">Сохранить</button>
+        </form>
+    }
+
+    @if (ErrorMessage is not null)
+    {
+        <div class="error">@ErrorMessage</div>
+    }
+
+    <table>
+        <thead><tr><th>Название</th><th>Email</th><th>Телефон</th><th>Страна</th><th>Статус</th></tr></thead>
+        <tbody>
+            @foreach (var supplier in SupplierList)
+            {
+                <tr>
+                    <td>@supplier.Name</td>
+                    <td>@supplier.ContactEmail</td>
+                    <td>@supplier.Phone</td>
+                    <td>@supplier.Country</td>
+                    <td>@(supplier.IsActive ? "Активен" : "Отключен")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>
+
+@code {
+    private IReadOnlyList<SupplierDto> SupplierList = [];
+    private bool ShowCreate;
+    private string? ErrorMessage;
+    private CreateSupplierRequest Form = new();
+
+    protected override async Task OnInitializedAsync() => SupplierList = await SupplierService.GetAllAsync();
+
+    private async Task CreateSupplier()
+    {
+        try
+        {
+            await SupplierService.CreateAsync(Form);
+            ShowCreate = false;
+            Form = new();
+            SupplierList = await SupplierService.GetAllAsync();
+        }
+        catch (BusinessRuleException exception)
+        {
+            ErrorMessage = exception.Message;
+        }
+    }
+}

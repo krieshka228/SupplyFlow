@@ -27,3 +27,9 @@ public interface ISupplyRepository
     Task AddAsync(Supply supply, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }
+
+public interface ISupplyWorkflowRepository
+{
+    Task ResetAsync(CancellationToken cancellationToken = default);
+    Task SeedAsync(IReadOnlyList<Product> products, IReadOnlyList<Supplier> suppliers, IReadOnlyList<Supply> supplies, CancellationToken cancellationToken = default);
+}

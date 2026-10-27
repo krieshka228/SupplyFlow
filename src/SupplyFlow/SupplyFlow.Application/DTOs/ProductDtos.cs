@@ -9,13 +9,15 @@ public sealed record ProductDto(
     string Category,
     bool IsArchived);
 
-public sealed record CreateProductRequest(
-    string Sku,
-    string Name,
-    string Description,
-    decimal Price,
-    int StockQuantity,
-    string Category);
+public sealed class CreateProductRequest
+{
+    public string Sku { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int StockQuantity { get; set; }
+    public string Category { get; set; } = "General";
+}
 
 public sealed record UpdateProductRequest(
     string Name,

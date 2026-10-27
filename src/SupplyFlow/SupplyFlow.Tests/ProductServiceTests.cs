@@ -25,7 +25,7 @@ public sealed class ProductServiceTests
     public async Task Create_Should_Add_Product()
     {
         var service = CreateService();
-        var product = await service.CreateAsync(new CreateProductRequest("sku-1", "Monitor", "27 inch", 15000, 10, "Electronics"));
+        var product = await service.CreateAsync(new CreateProductRequest { Sku = "sku-1", Name = "Monitor", Description = "27 inch", Price = 15000, StockQuantity = 10, Category = "Electronics" });
 
         Assert.NotEqual(Guid.Empty, product.Id);
         Assert.Equal("SKU-1", product.Sku);
@@ -35,9 +35,9 @@ public sealed class ProductServiceTests
     public async Task Create_Should_Reject_Duplicate_Sku()
     {
         var service = CreateService();
-        await service.CreateAsync(new CreateProductRequest("sku-1", "Monitor", "", 15000, 10, "Electronics"));
+        await service.CreateAsync(new CreateProductRequest { Sku = "sku-1", Name = "Monitor", Description = "", Price = 15000, StockQuantity = 10, Category = "Electronics" });
 
         await Assert.ThrowsAsync<BusinessRuleException>(() =>
-            service.CreateAsync(new CreateProductRequest("sku-1", "Second", "", 100, 1, "Electronics")));
+            service.CreateAsync(new CreateProductRequest { Sku = "sku-1", Name = "Second", Price = 100, StockQuantity = 1, Category = "Electronics" }));
     }
 }
