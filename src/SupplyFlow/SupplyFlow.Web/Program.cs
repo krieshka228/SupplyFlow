@@ -18,10 +18,14 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<SupplyFlowDbContext>();
     await context.Database.MigrateAsync();
+
+    var seeder = scope.ServiceProvider.GetRequiredService<SupplyFlow.Application.Services.ISupplyWorkflowService>();
+    await seeder.SeedIfEmptyAsync();
 }
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTimeOffset.UtcNow }));
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 app.Run();

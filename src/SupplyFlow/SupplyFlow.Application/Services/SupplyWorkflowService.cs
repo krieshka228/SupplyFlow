@@ -1,5 +1,4 @@
 using SupplyFlow.Application.Contracts;
-using SupplyFlow.Application.DTOs;
 using SupplyFlow.Domain.Entities;
 using SupplyFlow.Domain.Enums;
 
@@ -8,13 +7,30 @@ namespace SupplyFlow.Application.Services;
 public interface ISupplyWorkflowService
 {
     Task ResetDemoDataAsync(CancellationToken cancellationToken = default);
+    Task SeedIfEmptyAsync(CancellationToken cancellationToken = default);
 }
 
-public sealed class SupplyWorkflowService(ISupplyWorkflowRepository repository) : ISupplyWorkflowService
+public sealed class SupplyWorkflowService(
+    ISupplyWorkflowRepository repository,
+    IProductRepository productRepository) : ISupplyWorkflowService
 {
+    public async Task SeedIfEmptyAsync(CancellationToken cancellationToken = default)
+    {
+        var products = await productRepository.GetAllAsync(cancellationToken);
+        if (products.Count > 0)
+            return;
+
+        await SeedDemoDataAsync(cancellationToken);
+    }
+
     public async Task ResetDemoDataAsync(CancellationToken cancellationToken = default)
     {
         await repository.ResetAsync(cancellationToken);
+        await SeedDemoDataAsync(cancellationToken);
+    }
+
+    private async Task SeedDemoDataAsync(CancellationToken cancellationToken = default)
+    {
 
         var products = new List<Product>
         {

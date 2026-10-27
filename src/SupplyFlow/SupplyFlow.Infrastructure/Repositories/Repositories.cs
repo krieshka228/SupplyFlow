@@ -27,6 +27,12 @@ public sealed class SupplierRepository(SupplyFlowDbContext context) : ISupplierR
     public async Task<IReadOnlyList<Supplier>> GetAllAsync(CancellationToken cancellationToken = default) =>
         await context.Suppliers.AsNoTracking().OrderBy(supplier => supplier.Name).ToListAsync(cancellationToken);
 
+    public async Task<Supplier?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
+        await context.Suppliers.FirstOrDefaultAsync(supplier => supplier.Id == id, cancellationToken);
+
+    public async Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default) =>
+        await context.Suppliers.AnyAsync(supplier => supplier.ContactEmail == email, cancellationToken);
+
     public async Task AddAsync(Supplier supplier, CancellationToken cancellationToken = default) =>
         await context.Suppliers.AddAsync(supplier, cancellationToken);
 

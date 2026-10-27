@@ -3,18 +3,65 @@ services:
     image: postgres:16-alpine
     container_name: supplyflow-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: supplyflow
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-supplyflow}
     ports:
       - "5433:5432"
     volumes:
       - supplyflow-postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-supplyflow}"]
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - supplyflow
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: supplyflow-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: Host=postgres;Port=5432;Database=${POSTGRES_DB:-supplyflow};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - supplyflow-api-data-protection:/home/app/.aspnet/DataProtection-Keys
+    user: app
+    networks:
+      - supplyflow
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: supplyflow-web
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: Host=postgres;Port=5432;Database=${POSTGRES_DB:-supplyflow};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5047:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - supplyflow-web-data-protection:/home/app/.aspnet/DataProtection-Keys
+    user: app
+    networks:
+      - supplyflow
+
+networks:
+  supplyflow:
 
 volumes:
   supplyflow-postgres-data:
+  supplyflow-api-data-protection:
+  supplyflow-web-data-protection:

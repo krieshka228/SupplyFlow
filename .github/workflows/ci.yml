@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -21,3 +21,12 @@ jobs:
         run: dotnet build SupplyFlow.sln --no-restore
       - name: Test
         run: dotnet test SupplyFlow.sln --no-build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Web image
+        run: docker build -f Dockerfile.web -t supplyflow-web:ci .
+      - name: Build API image
+        run: docker build -f Dockerfile.api -t supplyflow-api:ci .

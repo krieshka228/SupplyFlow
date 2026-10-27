@@ -1,0 +1,13 @@
+bin/
+obj/
+.git/
+.idea/
+.vs/
+*.user
+*.suo
+*.log
+.env
+TestResults/
+coverage/
+**/bin/
+**/obj/

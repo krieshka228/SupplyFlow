@@ -24,6 +24,8 @@ public sealed class SupplierService(ISupplierRepository repository) : ISupplierS
             throw new BusinessRuleException("Supplier name is required.");
         if (string.IsNullOrWhiteSpace(request.ContactEmail))
             throw new BusinessRuleException("Supplier email is required.");
+        if (await repository.EmailExistsAsync(request.ContactEmail.Trim(), cancellationToken))
+            throw new BusinessRuleException($"Supplier with email '{request.ContactEmail}' already exists.");
 
         var supplier = new Supplier
         {

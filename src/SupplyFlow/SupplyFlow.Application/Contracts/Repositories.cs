@@ -15,6 +15,8 @@ public interface IProductRepository
 public interface ISupplierRepository
 {
     Task<IReadOnlyList<Supplier>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<Supplier?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default);
     Task AddAsync(Supplier supplier, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -32,10 +32,17 @@ LTS-версия, актуальная для вакансий, поддержи
 ## Как запустить?
 
 ```bash
-docker compose up -d
-dotnet run --project src/SupplyFlow/SupplyFlow.Web
+cp .env.example .env
+docker compose up --build -d
 ```
+
+Web: http://localhost:5047  
+API: http://localhost:5080
 
 ## Какой порт PostgreSQL?
 
 5433, чтобы не конфликтовать с локальным PostgreSQL.
+
+## Как деплоится?
+
+Docker Compose: PostgreSQL, API и Web в одной сети. Приложения применяют миграции при старте, при пустой базе создают демо-данные, у PostgreSQL healthcheck, у приложений restart policy. Data Protection ключи хранятся в Docker-томах, приложения работают от непривилегированного пользователя.

@@ -206,3 +206,19 @@ td:last-child {
   .sidebar { position: static; width: auto; }
   main { margin-left: 0; padding: 20px; }
 }
+
+#blazor-error-ui {
+  display: none;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #991b1b;
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+#blazor-error-ui.visible {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

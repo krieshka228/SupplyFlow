@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY SupplyFlow.sln ./
+COPY src/SupplyFlow/SupplyFlow.Domain/SupplyFlow.Domain.csproj src/SupplyFlow/SupplyFlow.Domain/
+COPY src/SupplyFlow/SupplyFlow.Application/SupplyFlow.Application.csproj src/SupplyFlow/SupplyFlow.Application/
+COPY src/SupplyFlow/SupplyFlow.Infrastructure/SupplyFlow.Infrastructure.csproj src/SupplyFlow/SupplyFlow.Infrastructure/
+COPY src/SupplyFlow/SupplyFlow.Api/SupplyFlow.Api.csproj src/SupplyFlow/SupplyFlow.Api/
+COPY src/SupplyFlow/SupplyFlow.Web/SupplyFlow.Web.csproj src/SupplyFlow/SupplyFlow.Web/
+RUN dotnet restore src/SupplyFlow/SupplyFlow.Web/SupplyFlow.Web.csproj
+
+COPY . .
+RUN dotnet publish src/SupplyFlow/SupplyFlow.Web/SupplyFlow.Web.csproj -c Release -o /app --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app .
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys \
+    && chown -R app:app /home/app
+USER app
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+ENTRYPOINT ["dotnet", "SupplyFlow.Web.dll"]

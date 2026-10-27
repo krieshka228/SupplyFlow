@@ -25,6 +25,11 @@ if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Testi
 }
 
 await app.Services.ApplyMigrationsAsync();
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<SupplyFlow.Application.Services.ISupplyWorkflowService>();
+    await seeder.SeedIfEmptyAsync();
+}
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTimeOffset.UtcNow }));
 app.Run();

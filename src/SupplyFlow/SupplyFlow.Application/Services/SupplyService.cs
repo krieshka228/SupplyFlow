@@ -47,8 +47,7 @@ public sealed class SupplyService(
         if (request.Items.Any(item => item.UnitPrice <= 0))
             throw new BusinessRuleException("Unit price must be positive.");
 
-        var supplier = await supplierRepository.GetAllAsync(cancellationToken)
-            .ContinueWith(task => task.Result.FirstOrDefault(item => item.Id == request.SupplierId), cancellationToken)
+        var supplier = await supplierRepository.GetByIdAsync(request.SupplierId, cancellationToken)
             ?? throw new EntityNotFoundException("Supplier", request.SupplierId);
 
         var supply = new Supply
