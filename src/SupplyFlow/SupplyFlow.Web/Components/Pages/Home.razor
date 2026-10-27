@@ -1,0 +1,41 @@
+@page "/"
+@inject DashboardService Dashboard
+
+<h1>SupplyFlow</h1>
+
+<p>Система управления поставками и товарными остатками.</p>
+
+@if (_summary is null)
+{
+    <p>Загрузка данных...</p>
+}
+else
+{
+    <div class="dashboard">
+        <div class="card">
+            <strong>@_summary.ProductCount</strong>
+            <span>Товаров</span>
+        </div>
+        <div class="card">
+            <strong>@_summary.SupplierCount</strong>
+            <span>Поставщиков</span>
+        </div>
+        <div class="card">
+            <strong>@_summary.ActiveSupplyCount</strong>
+            <span>Активных поставок</span>
+        </div>
+        <div class="card">
+            <strong>@_summary.LowStockCount</strong>
+            <span>Мало на остатке</span>
+        </div>
+    </div>
+}
+
+@code {
+    private DashboardSummary? _summary;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _summary = await Dashboard.GetSummaryAsync();
+    }
+}
